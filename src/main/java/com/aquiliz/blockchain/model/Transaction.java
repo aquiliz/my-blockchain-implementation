@@ -15,4 +15,5 @@ public class Transaction {
     private String fromAddress;
     private String toAddress;
     private BigDecimal amount;
+    private TransactionType type;
 }

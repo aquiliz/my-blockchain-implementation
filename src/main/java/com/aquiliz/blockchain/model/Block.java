@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Getter
@@ -18,6 +19,7 @@ import java.util.List;
 public class Block {
     private static final int BLOCK_MINE_REWARD = 20;
     private static final String BLOCKCHAIN_SYSTEM_ADDRESS = "blockchainSystemAddress";
+    private final String id;
     private String hash;
     private final String previousHash;
     private final List<Transaction> transactions;
@@ -25,6 +27,7 @@ public class Block {
     private int nonce;
 
     public Block(@NonNull List<Transaction> transactions, String previousHash, @NonNull long timestamp) {
+        this.id = UUID.randomUUID().toString();
         this.transactions = transactions;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
@@ -51,11 +54,12 @@ public class Block {
         }
         //Mining is successful. Add a reward transaction.
         transactions.add(generateRewardTransaction(minerAddress));
+        log.info("Added block mine reward={} for address={}", BLOCK_MINE_REWARD, minerAddress);
         return hash;
     }
 
     private Transaction generateRewardTransaction(String receiverAddress) {
-        return new Transaction(BLOCKCHAIN_SYSTEM_ADDRESS, receiverAddress, BigDecimal.valueOf(BLOCK_MINE_REWARD));
+        return new Transaction(BLOCKCHAIN_SYSTEM_ADDRESS, receiverAddress, BigDecimal.valueOf(BLOCK_MINE_REWARD), TransactionType.REWARD);
     }
 
     private String generateZeroesString(int zeroesCount) {

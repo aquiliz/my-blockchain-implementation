@@ -2,6 +2,7 @@ package com.aquiliz.blockchain;
 
 import com.aquiliz.blockchain.model.Block;
 import com.aquiliz.blockchain.model.Transaction;
+import com.aquiliz.blockchain.model.TransactionType;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -20,9 +21,9 @@ public class Runner {
     }
 
     private static List<Transaction> createDummyTransactions() {
-        Transaction transaction1 = new Transaction("Alice", "Bob", BigDecimal.valueOf(5.1618));
-        Transaction transaction2 = new Transaction("Ken", "Josh", BigDecimal.valueOf(100));
-        Transaction transaction3 = new Transaction("Marie", "Hellen", BigDecimal.valueOf(200));
+        Transaction transaction1 = new Transaction("Alice", "Bob", BigDecimal.valueOf(5.1618), TransactionType.TRANSFER);
+        Transaction transaction2 = new Transaction("Ken", "Josh", BigDecimal.valueOf(100), TransactionType.TRANSFER);
+        Transaction transaction3 = new Transaction("Marie", "Hellen", BigDecimal.valueOf(200), TransactionType.TRANSFER);
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction1);
         transactions.add(transaction2);

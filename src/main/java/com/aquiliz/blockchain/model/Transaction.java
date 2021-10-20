@@ -1,19 +1,26 @@
 package com.aquiliz.blockchain.model;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-@AllArgsConstructor
 @Getter
 @EqualsAndHashCode
 @ToString
 public class Transaction {
-    private String fromAddress;
-    private String toAddress;
-    private BigDecimal amount;
-    private TransactionType type;
+    private final String id = UUID.randomUUID().toString();
+    private final String fromAddress;
+    private final String toAddress;
+    private final BigDecimal amount;
+    private final TransactionType type;
+
+    public Transaction(String fromAddress, String toAddress, BigDecimal amount, TransactionType type) {
+        this.fromAddress = fromAddress;
+        this.toAddress = toAddress;
+        this.amount = amount;
+        this.type = type;
+    }
 }

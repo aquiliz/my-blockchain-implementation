@@ -35,14 +35,15 @@ public class Block {
     }
 
     private String calculateHash() {
-        String preHashed = previousHash != null ? previousHash : "" + String.valueOf(timestamp) + nonce + transactions.hashCode();
+        String previousHashComputed = previousHash != null ? previousHash : "";
+        String hashSource = previousHashComputed + String.valueOf(timestamp) + nonce + transactions.hashCode();
         MessageDigest digest = null;
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Attempted to generate block hash with non existing hashing algorithm.");
+            throw new IllegalStateException("Attempted to generate block hash with non-existing hashing algorithm.", e);
         }
-        byte[] hash = digest.digest(preHashed.getBytes(StandardCharsets.UTF_8));
+        byte[] hash = digest.digest(hashSource.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hash);
     }
 
@@ -51,10 +52,12 @@ public class Block {
         while (!hash.substring(0, prefixZeroesCount).equals(expectedPrefix)) {
             nonce++;
             this.hash = calculateHash();
+            log.trace("Newly generated hash: {}", this.hash);
         }
         //Mining is successful. Add a reward transaction.
         transactions.add(generateRewardTransaction(minerAddress));
-        log.info("Added block mine reward={} for address={}", BLOCK_MINE_REWARD, minerAddress);
+        log.info("Successfully mined blockId='{}' with hash='{}'. Adding reward={} for address={}", getId(),
+                getHash(), BLOCK_MINE_REWARD, minerAddress);
         return hash;
     }
 

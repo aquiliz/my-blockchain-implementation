@@ -29,6 +29,14 @@ public final class BlockChain {
         return instance;
     }
 
+    public synchronized void addGenesisBlock(Block block) {
+        if (!blocks.isEmpty()) {
+            throw new IllegalStateException("Failed to add blockId='{}' as a genesis block, because the blockchain is not empty.");
+        }
+        //TODO check if hash starts with X zeroes ?
+        blocks.add(block);
+    }
+
     public synchronized void addBlock(Block block) {
         if (!previousHashCorrect(block)) {
             throw new InvalidBlockException("Block with id='" + block.getId() + "' has invalid hash of previous block: "

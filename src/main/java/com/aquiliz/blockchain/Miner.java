@@ -38,6 +38,8 @@ public class Miner {
                 validateTransaction(balances, transaction);
             } catch (InsufficientFundsException e) {
                 log.info(e.getMessage());
+                block.getTransactions().remove(transaction);
+                log.debug("Removed invalid transaction id={}", transaction.getId());
             }
 
         });

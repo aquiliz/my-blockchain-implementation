@@ -12,12 +12,12 @@ import java.util.List;
 @Slf4j
 public class Runner {
 
-    private static final int MINING_DIFFICULTY = 1;
+    private static final int DEFAULT_MINING_DIFFICULTY = 3;
 
     public static void main(String[] args) {
         BlockChain blockChain = BlockChain.getInstance();
 
-        Miner miner1 = new Miner(MINING_DIFFICULTY, "miner1");
+        Miner miner1 = new Miner(getMiningDifficulty(), "miner1");
         Block genesisBlock = miner1.generateBlock(createDummyTransactions(), null);
         blockChain.addGenesisBlock(genesisBlock);
 
@@ -25,6 +25,14 @@ public class Runner {
         blockChain.addBlock(block2);
 
         System.out.println(genesisBlock);
+    }
+
+    private static int getMiningDifficulty() {
+        String val = System.getenv("MINING_DIFFICULTY");
+        if (val == null || val.trim().isEmpty()) {
+            return DEFAULT_MINING_DIFFICULTY;
+        }
+        return Integer.parseInt(val);
     }
 
     private static List<Transaction> createDummyTransactions() {

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,17 @@ public class Miner {
 
     private final int miningDifficulty;
     private final String minerAddress;
-    private final BlockChain blockChain = BlockChain.getInstance();
+    private final BlockChain blockChain;
 
     public Miner(int miningDifficulty, String minerAddress) {
+        this.blockChain =  BlockChain.getInstance();
+        this.miningDifficulty = miningDifficulty;
+        this.minerAddress = minerAddress;
+    }
+
+    /** Designed to be used in tests only (hence default modifier) */
+    Miner(BlockChain blockChain, int miningDifficulty, String minerAddress) {
+        this.blockChain = blockChain;
         this.miningDifficulty = miningDifficulty;
         this.minerAddress = minerAddress;
     }
@@ -33,17 +42,18 @@ public class Miner {
 
     private void validateBlockTransactions(Block block) {
         Map<String, BigDecimal> balances = new HashMap<>();
+        List<Transaction> invalidTransactions = new ArrayList<>();
         block.getTransactions().forEach(transaction -> {
             try {
                 validateTransaction(balances, transaction);
             } catch (InsufficientFundsException e) {
                 log.info(e.getMessage());
-                block.getTransactions().remove(transaction);
-                log.debug("Removed invalid transaction id={}", transaction.getId());
+                invalidTransactions.add(transaction);
+                log.debug("Invalid transaction id={} marked for removal", transaction.getId());
             }
-
         });
-        log.info("All {} transaction(s) were successfully validated for block id={}", block.getTransactions().size(),
+        block.getTransactions().removeAll(invalidTransactions);
+        log.info("{} transaction(s) were successfully validated for block id={}", block.getTransactions().size(),
                 block.getId());
     }
 

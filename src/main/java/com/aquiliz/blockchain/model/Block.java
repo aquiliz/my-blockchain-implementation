@@ -52,7 +52,6 @@ public class Block {
         while (!hash.substring(0, prefixZeroesCount).equals(expectedPrefix)) {
             nonce++;
             this.hash = calculateHash();
-            log.trace("Newly generated hash: {}", this.hash);
         }
         //Mining is successful. Add a reward transaction.
         transactions.add(generateRewardTransaction(minerAddress));

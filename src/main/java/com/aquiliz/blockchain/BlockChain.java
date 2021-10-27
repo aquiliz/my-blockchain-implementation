@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public final class BlockChain {
+public class BlockChain {
 
     private static BlockChain instance;
     private final List<Block> blocks = new ArrayList<>();

@@ -21,15 +21,15 @@ public class BlockChainTest {
     private static final int MINING_DIFFICULTY = 3;
     private static BlockChain blockChain;
     private static Block genesisBlock;
-    private static Block firstBlock;
+    private static Block secondBlock;
 
     @BeforeAll
     public static void beforeAll() {
         blockChain = BlockChain.getInstance();
         genesisBlock = generateGenesisBlock();
-        firstBlock = generateFirstBlock(genesisBlock.getHash());
+        secondBlock = generateFirstBlock(genesisBlock.getHash());
         blockChain.addGenesisBlock(genesisBlock, MINING_DIFFICULTY);
-        blockChain.addBlock(firstBlock, MINING_DIFFICULTY);
+        blockChain.addBlock(secondBlock, MINING_DIFFICULTY);
     }
 
     @Test
@@ -52,14 +52,14 @@ public class BlockChainTest {
 
     @Test
     void should_Get_Latest_Block() {
-        assertEquals(firstBlock, blockChain.getLatestBlock());
+        assertEquals(secondBlock, blockChain.getLatestBlock());
     }
 
     @Test
     void should_Fail_On_Attempt_ToAddGenesisBlock_On_NonEmptyBlockChain() {
         IllegalStateException thrown = assertThrows(
                 IllegalStateException.class,
-                () -> blockChain.addGenesisBlock(firstBlock, MINING_DIFFICULTY));
+                () -> blockChain.addGenesisBlock(secondBlock, MINING_DIFFICULTY));
         assertTrue(thrown.getMessage().contains("Failed to add blockId"));
         assertTrue(thrown.getMessage().contains("because the blockchain is not empty"));
     }
@@ -80,7 +80,7 @@ public class BlockChainTest {
         Transaction transaction1 = new Transaction(null, null, BigDecimal.valueOf(20), TransactionType.TRANSFER);
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction1);
-        Block block = new Block(transactions, firstBlock.getHash(), Instant.now().toEpochMilli());
+        Block block = new Block(transactions, secondBlock.getHash(), Instant.now().toEpochMilli());
         block.mine(MINING_DIFFICULTY, "miner1");
 
         InvalidTransactionException thrown = assertThrows(
@@ -94,7 +94,7 @@ public class BlockChainTest {
         Transaction transaction1 = new Transaction("Alice", "Alice", BigDecimal.valueOf(20), TransactionType.TRANSFER);
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction1);
-        Block block = new Block(transactions, firstBlock.getHash(), Instant.now().toEpochMilli());
+        Block block = new Block(transactions, secondBlock.getHash(), Instant.now().toEpochMilli());
         block.mine(MINING_DIFFICULTY, "miner1");
 
         InvalidTransactionException thrown = assertThrows(
@@ -108,7 +108,7 @@ public class BlockChainTest {
         Transaction transaction1 = new Transaction("Alice", "Bob", BigDecimal.valueOf(20), TransactionType.TRANSFER);
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction1);
-        Block block = new Block(transactions, firstBlock.getHash(), Instant.now().toEpochMilli());
+        Block block = new Block(transactions, secondBlock.getHash(), Instant.now().toEpochMilli());
         InvalidBlockException thrown = assertThrows(
                 InvalidBlockException.class,
                 () -> blockChain.addBlock(block, MINING_DIFFICULTY));
@@ -119,8 +119,8 @@ public class BlockChainTest {
     @Test
     void should_Fail_On_Attempt_ToAddBlock_Without_Transactions() {
         Block block = Mockito.mock(Block.class);
-        Mockito.when(block.getPreviousHash()).thenReturn(firstBlock.getHash());
-        Mockito.when(block.getHash()).thenReturn(firstBlock.getHash() + "123");
+        Mockito.when(block.getPreviousHash()).thenReturn(secondBlock.getHash());
+        Mockito.when(block.getHash()).thenReturn(secondBlock.getHash() + "123");
         Mockito.when(block.getTransactions()).thenReturn(new ArrayList<>());
         InvalidBlockException thrown = assertThrows(
                 InvalidBlockException.class,

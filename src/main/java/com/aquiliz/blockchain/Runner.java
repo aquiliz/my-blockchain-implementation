@@ -16,13 +16,14 @@ public class Runner {
 
     public static void main(String[] args) {
         BlockChain blockChain = BlockChain.getInstance();
+        int miningDifficulty = getMiningDifficulty();
 
-        Miner miner1 = new Miner(getMiningDifficulty(), "miner1");
+        Miner miner1 = new Miner(miningDifficulty, "miner1");
         Block genesisBlock = miner1.generateBlock(createDummyTransactions(), null);
-        blockChain.addGenesisBlock(genesisBlock);
+        blockChain.addGenesisBlock(genesisBlock, miningDifficulty);
 
         Block block2 = miner1.generateBlock(createDummyTransactions2(), genesisBlock.getHash());
-        blockChain.addBlock(block2);
+        blockChain.addBlock(block2, miningDifficulty);
 
         System.out.println(genesisBlock);
     }

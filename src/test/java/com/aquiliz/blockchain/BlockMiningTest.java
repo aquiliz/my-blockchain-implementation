@@ -18,7 +18,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class MinerTest {
+public class BlockMiningTest {
 
     private Miner miner;
     private BlockChain blockChain;

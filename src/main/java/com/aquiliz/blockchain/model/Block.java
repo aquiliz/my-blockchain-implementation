@@ -47,9 +47,9 @@ public class Block {
         return Base64.getEncoder().encodeToString(hash);
     }
 
-    public String mine(int prefixZeroesCount, String minerAddress) {
-        String expectedPrefix = generateZeroesString(prefixZeroesCount);
-        while (!hash.substring(0, prefixZeroesCount).equals(expectedPrefix)) {
+    public String mine(int miningDifficulty, String minerAddress) {
+        String expectedPrefix = generateZeroesString(miningDifficulty);
+        while (!hash.substring(0, miningDifficulty).equals(expectedPrefix)) {
             nonce++;
             this.hash = calculateHash();
         }

@@ -29,21 +29,34 @@ public class BlockChain {
         return instance;
     }
 
-    public synchronized void addGenesisBlock(Block block) {
+    public synchronized void addGenesisBlock(@NonNull Block block, int miningDifficulty) {
         if (!blocks.isEmpty()) {
-            throw new IllegalStateException("Failed to add blockId='{}' as a genesis block, because the blockchain is not empty.");
+            throw new IllegalStateException("Failed to add blockId=" + block.getId() + " as a genesis block," +
+                    " because the blockchain is not empty.");
         }
-        //TODO check if hash starts with X zeroes ?
+        validateBlock(block, miningDifficulty);
         blocks.add(block);
     }
 
-    public synchronized void addBlock(Block block) {
+    public synchronized void addBlock(@NonNull Block block, int miningDifficulty) {
         if (!previousHashCorrect(block)) {
             throw new InvalidBlockException("Block with id='" + block.getId() + "' has invalid hash of previous block: "
                     + block.getPreviousHash());
         }
-        //TODO check if hash starts with X zeroes ?
+        validateBlock(block, miningDifficulty);
         blocks.add(block);
+    }
+
+    private void validateBlock(Block block, int miningDifficulty) {
+        if (!block.getHash().startsWith(generateZeroesString(miningDifficulty))) {
+            throw new InvalidBlockException("Hash of block with id=" + block.getId() + " does not satisfy the miningDifficulty=" +
+                    miningDifficulty + " and will not be added to the blockchain.");
+        }
+        if (block.getTransactions() == null || block.getTransactions().isEmpty()) {
+            throw new InvalidBlockException("Block with id=" + block.getId() + " has a null or empty list of transactions" +
+                    " and will not be added to the blockchain.");
+        }
+        block.getTransactions().forEach(this::validateTransaction);
     }
 
     public synchronized Block getLatestBlock() {
@@ -58,7 +71,6 @@ public class BlockChain {
         BigDecimal balance = new BigDecimal(0);
         for (Block block : blocks) {
             for (Transaction transaction : block.getTransactions()) {
-                validateTransaction(transaction);
                 if (transaction.getFromAddress().equals(address) && isSpending(transaction)) {
                     balance = balance.subtract(transaction.getAmount());
                 } else if (transaction.getToAddress().equals(address) && isIncome(transaction)) {
@@ -80,12 +92,17 @@ public class BlockChain {
 
     private void validateTransaction(Transaction transaction) {
         if (transaction.getFromAddress() == null || transaction.getToAddress() == null) {
-            throw new InvalidTransactionException("Detected transaction that has null 'from' or 'to' address");
+            throw new InvalidTransactionException("Transaction id=" + transaction.getId() + " has null 'from' or 'to'" +
+                    " address");
         }
         if (transaction.getFromAddress().equals(transaction.getToAddress())) {
             throw new InvalidTransactionException("Detected transaction that has the same 'from' and 'to' address: " +
-                    transaction.getFromAddress());
+                    transaction.getFromAddress() + " , transactionId=" + transaction.getId());
         }
+    }
+
+    private String generateZeroesString(int zeroesCount) {
+        return "0".repeat(Math.max(0, zeroesCount));
     }
 
     private boolean previousHashCorrect(Block block) {
